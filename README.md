@@ -7,7 +7,7 @@ Author: Leandro Balzano-Nogueira
 
 InterroGATOR is a Shiny application for conducting differential expression and Spatial analyses on different cell types in different human tissues. This application allows the user to analyze cell expression profiles from CITEseq and CODEX data previously integrated (Manuscript in preparation).
 
-InterroGATOR is the visualization and data analysis after two integrative pipelines developes in Brusko Lab, University of Florida Diabetes Institute (https://bruskolab.diabetes.ufl.edu/).
+InterroGATOR is the visualization and data analysis after two integrative pipelines developed in Brusko Lab, University of Florida Diabetes Institute (https://bruskolab.diabetes.ufl.edu/).
 * Step 1: Single-cell CITE-seq processing and Integration.
 * Step 2: CODEX/CITEseq Integration strategy.
 
