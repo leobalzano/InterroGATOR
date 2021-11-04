@@ -28,9 +28,9 @@ Amongst other utilities!
 
 ## How to install and run InterroGATOR
 
-There are two main options to run InteGrATOR:
-* Run InteGrATOR as Docker image
-* Directly download and run InteGrATOR as shiny app.
+There are two main options to run InterroGATOR:
+* Run InterroGATOR as Docker image
+* Directly download and run InterroGATOR as shiny app.
 
 ## Run InterroGATOR as Docker Image
 install the Docker engine.
