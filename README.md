@@ -1,13 +1,13 @@
-# InteGrATOR
+# InterroGATOR
 
 Last Updated: 10/19/2021 (v1.0)   InteGrATOR release!
 Author: Leandro Balzano-Nogueira
 
-## What is InteGrATOR?
+## What is InterroGATOR?
 
-InteGrATOR is a Shiny application for conducting differential expression and Spatial analyses on different cell types in different human tissues. This application allows the user to analyze cell expression profiles from CITEseq and CODEX data previously integrated (Manuscript in preparation).
+InterroGATOR is a Shiny application for conducting differential expression and Spatial analyses on different cell types in different human tissues. This application allows the user to analyze cell expression profiles from CITEseq and CODEX data previously integrated (Manuscript in preparation).
 
-InteGrator is the visualization and data analysis after two integrative pipelines developes in Brusko Lab, University of Florida Diabetes Institute (https://bruskolab.diabetes.ufl.edu/).
+InterroGATOR is the visualization and data analysis after two integrative pipelines developes in Brusko Lab, University of Florida Diabetes Institute (https://bruskolab.diabetes.ufl.edu/).
 * Step 1: Single-cell CITE-seq processing and Integration.
 * Step 2: CODEX/CITEseq Integration strategy.
 
@@ -18,18 +18,18 @@ Finally, the cell type identification was performed using Azimuth v0.4.3 (Hao, e
 Step 2: The strategy to integrate CODEX and CITEseq data is based on (Govek et al., 2021). Briefly, the algorithm maps the CODEX protein space to the CITE-seq protein space using a modified version of the anchor correction proposed by (Stuart et al., 2019) and implemented in Seurat v4 (Hao et al., 2021). Specifically, a set of anchors is identified using a mutual nearest neighbors approach with kanchor = 20. The algorithm finds the nearest neighbors using Euclidean distance in a common 29-dimensional space obtained by canonical correlation analysis (CCA). Then, the anchors that do not preserve the structure of the original protein space were filtered out and the cells in the CODEX dataset were aligned into the CITE-seq protein space. To be able to transfer quantities between the CITE-seq and CODEX dataset, a transfer matrix was built. 
 Spatial relationship among cell populations. To assess the spatial relationship between two features we followed STvEA algorithm (Govek et al., 2021). Briefly, a k nearest neighbor using Euclidean distance of the CODEX spatial dimensions was computed. Then an adjacency matrix was calculated and used to calculate an adjacency score for each marker. The larger the score value, the larger the values of the features un adjacent cells.  The the false discovery rate for multiple hypothesis testing is controlled by using the Benjamini-Hochberg procedure.
 
-Once the data is integrated and processed, InteGrATOR can be used to identify different features associated to a particular cell types as well as the location of these particular cells in a tissue. InteGrATOR allows to infer many aspects related to a tissue, such as:
+Once the data is integrated and processed, InterroGATOR can be used to identify different features associated to a particular cell types as well as the location of these particular cells in a tissue. InteGrATOR allows to infer many aspects related to a tissue, such as:
 * The identification of certain tissue structures and evaluate its behavior to determine efficiency or disease causes.
 * Identify features as markers of disease progression in a particular tissue.
 * Compare Differential expression profiles of different cell types to evaluate a particular tissue or even identify cell sub-types.
 
-## How to install and run InteGrATOR
+## How to install and run InterroGATOR
 
 There are two main options to run InteGrATOR:
 * Run InteGrATOR as Docker image
 * Directly download and run InteGrATOR as shiny app.
 
-## Run InteGrATOR as Docker Image
+## Run InterroGATOR as Docker Image
 install the Docker engine.
 Run InteGrATOR with the following command in terminal (Mac/Linux) or PowerShell (Win):
 
@@ -39,7 +39,7 @@ docker run --rm -p 3838:3838 leobalzano/InteGrATOR:InteGrATOR
 
 Open the URL shows in the terminal (typically http://[::]:3838) in any web browser.
 
-## Run InteGrATOR as Shiny app
+## Run InterroGATOR as Shiny app
 * Download or clone InteGrATOR repository
 
 ```
