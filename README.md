@@ -18,7 +18,7 @@ Finally, the cell type identification was performed using Azimuth v0.4.3 (Hao, e
 Step 2: The strategy to integrate CODEX and CITEseq data is based on (Govek et al., 2021). Briefly, the algorithm maps the CODEX protein space to the CITE-seq protein space using a modified version of the anchor correction proposed by (Stuart et al., 2019) and implemented in Seurat v4 (Hao et al., 2021). Specifically, a set of anchors is identified using a mutual nearest neighbors approach with kanchor = 20. The algorithm finds the nearest neighbors using Euclidean distance in a common 29-dimensional space obtained by canonical correlation analysis (CCA). Then, the anchors that do not preserve the structure of the original protein space were filtered out and the cells in the CODEX dataset were aligned into the CITE-seq protein space. To be able to transfer quantities between the CITE-seq and CODEX dataset, a transfer matrix was built. 
 Spatial relationship among cell populations. To assess the spatial relationship between two features we followed STvEA algorithm (Govek et al., 2021). Briefly, a k nearest neighbor using Euclidean distance of the CODEX spatial dimensions was computed. Then an adjacency matrix was calculated and used to calculate an adjacency score for each marker. The larger the score value, the larger the values of the features un adjacent cells.  The the false discovery rate for multiple hypothesis testing is controlled by using the Benjamini-Hochberg procedure.
 
-Once the data is integrated and processed, InterroGATOR can be used to identify different features associated to a particular cell types as well as the location of these particular cells in a tissue. InteGrATOR allows to infer many aspects related to a tissue, such as:
+Once the data is integrated and processed, InterroGATOR can be used to identify different features associated to a particular cell types as well as the location of these particular cells in a tissue. InterroGATOR allows to infer many aspects related to a tissue, such as:
 * The identification of certain tissue structures and evaluate its behavior to determine efficiency or disease causes.
 * Identify features as markers of disease progression in a particular tissue.
 * Compare Differential expression profiles of different cell types to evaluate a particular tissue or even identify cell sub-types.
@@ -31,19 +31,19 @@ There are two main options to run InteGrATOR:
 
 ## Run InterroGATOR as Docker Image
 install the Docker engine.
-Run InteGrATOR with the following command in terminal (Mac/Linux) or PowerShell (Win):
+Run InterroGATOR with the following command in terminal (Mac/Linux) or PowerShell (Win):
 
 ```
-docker run --rm -p 3838:3838 leobalzano/InteGrATOR:InteGrATOR
+docker run --rm -p 8787:8787 leobalzano/InterroGATOR:1.0
 ```
 
-Open the URL shows in the terminal (typically http://[::]:3838) in any web browser.
+Open the URL shows in the terminal (typically http://[::]:8787) in any web browser.
 
 ## Run InterroGATOR as Shiny app
-* Download or clone InteGrATOR repository
+* Download or clone InterroGATOR repository
 
 ```
-git clone https://github.com/leobalzano/InteGrATOR.git
+git clone https://github.com/leobalzano/InterroGATOR.git
 ```
 
 * Unzip the file in data folder
