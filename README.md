@@ -23,6 +23,9 @@ Once the data is integrated, InterroGATOR can be used to identify different feat
 * Identify features as markers of disease progression in a particular tissue.
 * Compare Differential expression profiles of different cell types to evaluate a particular tissue or even identify cell sub-types.
 
+Amongst other utilities!
+
+
 ## How to install and run InterroGATOR
 
 There are two main options to run InteGrATOR:
