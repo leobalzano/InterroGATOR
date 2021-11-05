@@ -1,11 +1,11 @@
 #############################################
-######     InteGrATOR_functions.R     #######
+#####     InterroGATOR_functions.R     ######
 #############################################
 # Author: Leandro Balzano-Nogueira
 # Diabetes Institute, University of Florida (Gainesville)
-# Last update: October/19/2021
+# Last update: November/5/2021
 
-# This script is to gather together the functions used for the InteGrATOR shiny Application.
+# This script is to gather together the functions used for the InterroGATOR shiny Application.
 #############################################
 # Functions:
 
@@ -72,7 +72,7 @@ minmaxnorm <- function(x, na.rm = TRUE) {
   return((x- min(x)) /(max(x)-min(x)))
 }
 
-PlotClusterCITE_Independently<- function(stvea_object, color_by,pt_size, highlight, Color="dodgerblue2") {
+PlotClusterCITE_Independently<- function(stvea_object, color_by,pt_size, highlight, Color="dodgerblue2", Selection_on_Top="no") {
   if (any(color_by==0)) {
     color_by<-as.factor(ifelse(as.numeric(as.character(color_by))<0,-1, as.numeric(as.character(color_by)) +1) )
     
@@ -89,13 +89,30 @@ PlotClusterCITE_Independently<- function(stvea_object, color_by,pt_size, highlig
   fill2<- ifelse(color_by %in% highlight, Color ,"gray95")
   colors2<- ifelse(color_by %in% highlight, Color ,"gray75")
   colors3<-unique(colors2)
-  ggplot(stvea_object@cite_emb, aes_string(x = colnames(stvea_object@cite_emb)[1], 
-                                           y = colnames(stvea_object@cite_emb)[2], 
-                                           color = factor(fill2)
-  )) + 
-    geom_point(fill=fill2,colour=colors2,size = pt_size,pch=21) + 
-    labs(title = paste("Group",highlight)) +
-    theme_void()
+  
+  if (Selection_on_Top=="no") {
+    ggplot(stvea_object@cite_emb, aes_string(x = colnames(stvea_object@cite_emb)[1], 
+                                             y = colnames(stvea_object@cite_emb)[2], 
+                                             color = factor(fill2)
+    )) + 
+      geom_point(fill=fill2,colour=colors2,size = pt_size,pch=21) + 
+      labs(title = paste("Group",highlight)) +
+      theme_void()
+  } else {
+    datita<-cbind(stvea_object@cite_emb,fill2=fill2, colors2=colors2)
+    datita<-datita %>% arrange(factor(fill2, levels = c("gray95",Color)) )
+    print("head(datita)" )
+    print(head(datita) )
+    print("tail(datita)" )
+    print(tail(datita) )
+    ggplot(datita, aes_string(x = colnames(datita)[1], 
+                                             y = colnames(datita)[2], 
+                                             color = factor(datita[,3])
+    )) + 
+      geom_point(fill=datita[,3],colour=datita[,4],size = pt_size,pch=21) + 
+      labs(title = paste("Group",highlight)) +
+      theme_void()
+  }
 }
 
 
@@ -812,7 +829,9 @@ FactortoDummy<-function (y, Name = NULL) {
   return(Z)
 }
 
+
 DEgenesPairwiseComparison <- function(X, groups){
+  #table(X[,1])
   if (any(X[,1]==0)) {
     X[,1]<-as.factor(ifelse(as.numeric(as.character(X[,1]))<0,-1, as.numeric(as.character(X[,1])) +1) )
     
@@ -820,8 +839,7 @@ DEgenesPairwiseComparison <- function(X, groups){
   
   if (length(groups)>2) {
     stop("Error!: You only can insert one or two groups at a time") 
-  }
-  else if (length(groups)==2) {
+  } else if (length(groups)==2) {
     datpiece<-X[X[,1] %in%groups,]
     dim(datpiece)
     table (datpiece[,1])
@@ -842,33 +860,44 @@ DEgenesPairwiseComparison <- function(X, groups){
   datpiece<-datpiece[,-1]
   datpiece[1:5,1:5]
   
+  
   Design<-FactortoDummy (predesign)
   colnames(Design)<-c("Case","Control")
   
   ContrastMat<-limma::makeContrasts(Diff=Case-Control,
                                     levels = colnames(Design) )
+  ContrastMat
   
+  dim(datpiece)
+  dim(Design)
+  class(datpiece)
+  class(Design)
   datpiece<-as.matrix(datpiece)
+  anyNA(Design)
+  anyNA(datpiece)
   
   fit<-lmFit(t(datpiece),Design)
   fit2<-contrasts.fit(fit, ContrastMat)
-  fit3<-eBayes(fit2)
+  suppressWarnings(fit3<-eBayes(fit2) )
   
   deg<-topTable(fit3, coef = "Diff",
                 p.value = 0.05, adjust.method = "fdr",lfc = log2(1.5),
                 number = nrow(datpiece))
   
-  dim(deg)
+  degALL<-topTable(fit3, coef = "Diff",
+                   p.value = 1, adjust.method = "fdr",lfc = log2(0),
+                   number = nrow(datpiece))
+  dim(deg);dim (degALL)
   summary (deg$logFC)
-  if (dim(deg)[1]==0) {
-    print("This analysis contanins no statistically significant feature")
-    deg2<-NULL
-    return(deg2)
-  } else {
-    deg2<- deg[order(deg$logFC),]
-    return(deg2)
-  }
+  deg2<- deg[order(deg$logFC),]
+  deg2<-cbind(deg2,DE_notDE=rep("DE",nrow(deg2)) )
+  deg2ALL<- degALL[order(degALL$logFC),]
+  deg2ALL<-deg2ALL[setdiff(rownames(deg2ALL),rownames(deg2)), ]
+  deg2ALL<-cbind(deg2ALL,DE_notDE=rep("non_DE",nrow(deg2ALL)) )
+  dim(deg);dim(deg2);dim (degALL);dim (deg2ALL)
+  return(list (DE=deg2,nDE=deg2ALL) )
 }
+
 
 RidgeplotbyGroup<- function (Data,Genes, Groups) {
   pretab<-Data[,c(1:5)]
@@ -1122,5 +1151,7 @@ ViolinplotbyGroup<- function (Data,Genes, Groups) {
   return(list(p1,p2,p3))
   
 }
+                      
 
 # END
+
