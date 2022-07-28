@@ -1,7 +1,13 @@
 # InterroGATOR
 
-Last Updated: 11/5/2021 (v1.0)   InterroGATOR release!
 Author: Leandro Balzano-Nogueira
+
+Diabetes Institute, University of Florida (Gainesville)
+
+Created: October/19/2021
+
+Last update: June/5/2022 (v1.1)    InterroGATOR release!
+
 
 ## What is InterroGATOR?
 
