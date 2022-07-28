@@ -58,8 +58,13 @@ git clone https://github.com/leobalzano/InterroGATOR.git
 
 ## References:
 Bryan, J. (2016). cellranger: Translate Spreadsheet Cell Ranges to Rows and Columns. R package version 1.1.0. 
+
 Butler, A., Hoffman, P., Smibert, P., Papalexi, E., & Satija, R. (2018). Integrating single-cell transcriptomic data across different conditions, technologies, and species. Nature Biotechnology, 36(5), 411–420. https://doi.org/10.1038/nbt.4096.
+
 Govek, K. W., Troisi, E. C., Miao, Z., Aubin, R. G., Woodhouse, S., & Camara, P. G. (2021). Single-cell transcriptomic analysis of mIHC images via antigen mapping. Science Advances, 7(10). https://doi.org/10.1126/sciadv.abc5464
+
 Hao, Y., Hao, S., Andersen-Nissen, E., Mauck, W. M., Zheng, S., Butler, A., Lee, M. J., Wilk, A. J., Darby, C., Zager, M., Hoffman, P., Stoeckius, M., Papalexi, E., Mimitou, E. P., Jain, J., Srivastava, A., Stuart, T., Fleming, L. M., Yeung, B., … Satija, R. (2021). Integrated analysis of multimodal single-cell data. Cell, 184(13), 3573-3587.e29. https://doi.org/10.1016/j.cell.2021.04.048
+
 Mulè, M. P., Martins, A. J., & Tsang, J. S. (2020). Normalizing and denoising protein expression data from droplet-based single cell profiling. BioRxiv. https://doi.org/10.1101/2020.02.24.963603
+
 Stuart, T., Butler, A., Hoffman, P., Hafemeister, C., Papalexi, E., Mauck, W. M., Hao, Y., Stoeckius, M., Smibert, P., & Satija, R. (2019). Comprehensive Integration of Single-Cell Data. Cell, 177(7), 1888-1902.e21. https://doi.org/10.1016/j.cell.2019.05.031.
