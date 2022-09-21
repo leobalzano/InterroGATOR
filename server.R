@@ -284,8 +284,7 @@ shinyServer(function(input, output, session) {
       })
     
     
-    
-    
+       
     ######
     # Creating a unique name to save tab4data
     
@@ -1085,28 +1084,19 @@ shinyServer(function(input, output, session) {
         var_to_sort<- input$selectgroupsforheatmap
         updateSelectizeInput(inputId="selectgroupsorder", choices = var_to_sort)
       })
-    
-    #browser()
+   
     observeEvent({
       input$ploteaHeatmap}, {
         req(dataforDE())
         req(input$selectfeaturesforheatmap)
         req(input$selectgroupsforheatmap)
-        #req(input$selectgroupsorder)
         req(input$heatmapcolor)
-        #req(input$cellnumber)
         req(input$lowerbreak)
         req(input$upperbreak)
         req(input$heatmapPlotsize)
         req(input$heatmapLegendsize)
         req(input$heatmapFeaturesize)
-        
-        
-        #numericInput(inputId="heatmapPlotsize",label = "Heatmap size (px)", value = 500,min = 100,max=3000,step = 1),
-        #numericInput(inputId="heatmapLegendsize",label = "Legend size", value = 0.8,min = 0.1,max=3,step = 0.1),
-        #numericInput(inputId="heatmapFeaturesize",label = "Feature size", value = 10,min = 10,max=300,step = 1),
-        
-        #browser()
+              
         output$p7<- renderPlot({
           HeatmapbyGroup(Data = dataforDE(),Genes=input$selectfeaturesforheatmap,Groups = input$selectgroupsforheatmap,Heatmap_Color = input$heatmapcolor,Ncells = input$cellnumber,Breaks = c(input$lowerbreak,input$upperbreak),group_order = c(input$selectgroupsorder),
                          legend_size=input$heatmapLegendsize,feature_size = input$heatmapFeaturesize )
@@ -1119,7 +1109,6 @@ shinyServer(function(input, output, session) {
         req(dataforDE())
         req(input$selectfeaturesforridgeandviolin)
         req(input$selectgroupsforridgeandviolin)
-        #browser()
         p<-RidgeplotbyGroup(Data=dataforDE(),Genes=input$selectfeaturesforridgeandviolin,Groups=input$selectgroupsforridgeandviolin)
         print("length(p)")
         print(length(p))
@@ -1180,18 +1169,12 @@ shinyServer(function(input, output, session) {
     observeEvent({
       
       input$clusterSpatialExpression}, {
-      #input$datatypeCODEXspatial}, {
         req(input$clusterSpatialExpression)
-        ####req(input$datatypeCODEXspatial)
         req(infotable2())
         req(input$IdentificationThreshold2)
-        #RetainSubset6
         
-        #browser()
         var_to_highlightSpatialExpression<- sort(unique (infotable4()[,input$clusterSpatialExpression]))
         updateSelectInput(session, inputId = "clusterincolorSpatialExpression", choices = var_to_highlightSpatialExpression )
-        #clusterincolorSpatialExpression
-        #var_to_highlightSpatialExpression
         print("input$clusterSpatialExpression")
         print(input$clusterSpatialExpression)
         print("input$clusterincolorSpatialExpression")
@@ -1204,14 +1187,10 @@ shinyServer(function(input, output, session) {
       input$datatypeCODEXspatial }, {
         req(req(infotable2()))
         req(input$datatypeCODEXspatial)
-        #req(input$clusterincolorSpatialExpression)
         
         print("input$datatypeCODEXspatial")
         print(input$datatypeCODEXspatial)
-        #print("input$clusterincolorSpatialExpression")
-        #print(input$clusterincolorSpatialExpression)
         
-        #browser()
         if (input$datatypeCODEXspatial =="protein" ){
           if (!is.null(infotable2()@codex_clean)) {
             var_to_highlightCODEXspatial <- colnames(infotable2()@codex_clean)
@@ -1230,23 +1209,16 @@ shinyServer(function(input, output, session) {
       })
     
     
-    #browser()
     observeEvent({
       input$ploteaCODEXspatial}, {
         req(infotable2())
         req(input$clusterSpatialExpression)
-        #req(input$clusterincolorSpatialExpression)
         req(input$datatypeCODEXspatial)
         req(input$selectfeaturesCODEXspatial)
         req(input$mincoCODEXspatial)
         req(input$IdentificationThreshold2)
-        #req(input$maximize_differences)   ##########
         
-        #browser()
-        ####### Nuevo
         IdThrs = as.numeric(as.character(input$IdentificationThreshold2))
-        #IdThrs=70
-        #var_to_highlightSpatialExpression<- sort(unique (infotable4()[,input$clusterSpatialExpression]))
         
         if (is.null (input$clusterincolorSpatialExpression)) {
           preinfotab4_tmp<-infotable4()
@@ -1263,10 +1235,7 @@ shinyServer(function(input, output, session) {
         precodexabovethrs<-preinfotab4_tmp[preinfotab4_tmp$Prob_threshold == "in",]
         codexabovethrs<-precodexabovethrs$CODEXname
         length(codexabovethrs)
-        
-        ####### Fin de Nuevo
-        
-        #browser()
+  
         output$p14<- renderPlot({
         if (input$RetainSubset6 == "Area" & input$Context =="Isolated"  ) {
           codexabovethrs<-intersect(codexabovethrs,Tab4piece2()$CODEXname)
@@ -1303,15 +1272,6 @@ shinyServer(function(input, output, session) {
     
     # Expression CODEX UMAP analysis
     #####################
-    
-
-    # observeEvent({
-    #   input$selectclusteringtypeUMAPclusters}, {
-    #     req(input$selectclusteringtypeUMAPclusters)
-    #     req(infotable4())
-    #     browser()
-    #     var_UMAPCODEXfeatures(infotable4()[,input$selectclusteringtypeUMAPclusters])
-    #   })
 
     observeEvent({
       input$ploteaCODEXUMAPclusters}, {
@@ -1322,13 +1282,8 @@ shinyServer(function(input, output, session) {
         req(input$sizefeatCODEXUMAPclusters)
         req(input$IdentificationThreshold3)
         req(input$SelectiononTopCODEXUMAPAnalysis)
-        #browser()
         
-        ####### Nuevo
         IdThrs = as.numeric(as.character(input$IdentificationThreshold3))
-        #IdThrs=70
-        #quantile(infotable4()$probCITEcell, na.rm=T) # from 0 to 100
-        #cellsabove<-infotable4()$CITEname[infotable4()$probCITEcell>=IdThrs]
         colnameVect<-c("orig.ident","assay_name","integrated_snn_res.0.5","seurat_clusters",
                        "CITE_snn_res.1","dsb_knn_res.1.5","wsnn_res.1.5",
                        "predicted.id","predicted.celltype","Higher_Hierarchy_grouping",
@@ -1347,8 +1302,6 @@ shinyServer(function(input, output, session) {
           preinfotab4_tmp$Prob_threshold<-ifelse(is.na(preinfotab4_tmp$probCITEcell) ,"out","in") 
           infotab4_tmp(preinfotab4_tmp)
         }
-        ####### Fin de Nuevo
-        
         
         thecolor2<- infotab4_tmp()[,input$selectclusteringtypeUMAPclusters]
         tab<-melt(table(thecolor2))
@@ -1391,11 +1344,7 @@ shinyServer(function(input, output, session) {
         req(input$highlightCODEXindep)
         req(input$IdentificationThreshold4)
         
-        ####### Nuevo
         IdThrs = as.numeric(as.character(input$IdentificationThreshold4))
-        #IdThrs=70
-        #quantile(infotable4()$probCITEcell, na.rm=T) # from 0 to 100
-        #cellsabove<-infotable4()$CITEname[infotable4()$probCITEcell>=IdThrs]
         colnameVect<-c("orig.ident","assay_name","integrated_snn_res.0.5","seurat_clusters",
                        "CITE_snn_res.1","dsb_knn_res.1.5","wsnn_res.1.5",
                        "predicted.id","predicted.celltype","Higher_Hierarchy_grouping",
@@ -1414,8 +1363,6 @@ shinyServer(function(input, output, session) {
           preinfotab4_tmp$Prob_threshold<-ifelse(is.na(preinfotab4_tmp$probCITEcell) ,"out","in") 
           infotab4_tmp(preinfotab4_tmp)
         }
-        ####### Fin de Nuevo
-        #browser()
         output$p20<- renderPlot({
           thecolor<- infotab4_tmp()[,input$selectclusteringtypeUMAPclusters];
           withProgress(message = 'Plotting... please wait!', value = 0, {
@@ -1455,18 +1402,15 @@ shinyServer(function(input, output, session) {
         req(input$datatypeAdjacencybyFeature)
         req(infotable2())
         req(infotable4())
-        #browser()
         if (input$datatypeAdjacencybyFeature =="protein" ){
           var_to_highlightAdjacencybyFeature <- colnames(infotable2()@codex_protein)
           updateSelectizeInput(session,inputId="selectfeaturesAdjacencybyFeature", choices = var_to_highlightAdjacencybyFeature, options = list(maxItems = 200))
-          
-          
+              
         } else  { 
           var_to_highlightAdjacencybyFeature <- colnames(infotable2()@codex_mRNA)
           updateSelectizeInput(session,inputId="selectfeaturesAdjacencybyFeature", choices = var_to_highlightAdjacencybyFeature, options = list(maxItems = 200)) 
           
         }
-        
         print("var_to_highlightAdjacencybyFeature")
         print(var_to_highlightAdjacencybyFeature)
         print("input$selectfeaturesAdjacencybyFeature")
@@ -1474,19 +1418,13 @@ shinyServer(function(input, output, session) {
 
       })
 
-    
-    
-    
+        
     observeEvent({
       input$ploteaAdjacencybyFeature}, {
         req(infotable2())
         req(infotable4())
         req(input$datatypeAdjacencybyFeature)
         req(input$selectfeaturesAdjacencybyFeature)
-        #browser()
-        # ##################
-        # Here we will insert the new section in which we will calculate and
-        # save the adjacency of several features
         
         prenameforadjtab(paste(substr(input$file1$name,1,nchar(input$file1$name)-4),substr(input$file2$name,1,nchar(input$file2$name)-6), sep= "_") )
     
@@ -1510,15 +1448,10 @@ shinyServer(function(input, output, session) {
           feature_adj_old_calculated<-NULL
           
           if (file.exists(FileLocationadj())) {
-            #print(paste(nrow(feature_adj_old_calculated)," Adjacency score(s) have been previously calculated") )
-            #browser()
             feature_adj_old <- read.csv(FileLocationadj(), row.names=1)
-            #print(feature_adj_old)
-            # Here it comes the step to select the pairs to be calculated!
             feature_adj_old$f_g<-paste(feature_adj_old$f,feature_adj_old$g, sep="_")
             feature_pairs( cbind(feature_pairs(),f_g=as.matrix(paste(feature_pairs()[,1],feature_pairs()[,2], sep="_"))) )
             
-            #feature_adj_old$f_g %in% feature_pairs()[,3]
             feature_adj_old_calculated<-feature_adj_old[feature_adj_old$f_g %in% feature_pairs()[,3],c(1:5)]
             
             testeo<-try(feature_pairs()[!is.element(feature_pairs()[,3],feature_adj_old$f_g ),c(1,2),drop=FALSE],silent = TRUE)
@@ -1538,8 +1471,6 @@ shinyServer(function(input, output, session) {
             } else{
               print(paste(c(nrow(feature_pairs()),"feature(s) pairs to be calculated:",t(feature_pairs())), collapse = " " ))
               withProgress(message = 'Calculating adjacency', value = 0, {
-              #feature_adj <-AdjScoreGenes(infotable2, gene_pairs=feature_pairs, k=3, num_cores=1) 
-              #datatypeAdjacencybyFeature
               feature_adj(AdjScore_calculator(infotable2(), feature_type=input$datatypeAdjacencybyFeature,Feature_Pairs=feature_pairs()) )
               })
               invadj<-feature_adj()[,c(2,1,3:5)]
@@ -1558,8 +1489,6 @@ shinyServer(function(input, output, session) {
           } else {
             print ("Adjacency feature(s) are being calculated and saved for the first time") 
             withProgress(message = 'Calculating adjacency', value = 0, {
-            #feature_adj <-AdjScoreGenes(infotable2, gene_pairs=feature_pairs, k=3, num_cores=1) 
-            #datatypeAdjacencybyFeature
             feature_adj (AdjScore_calculator(infotable2(), feature_type=input$datatypeAdjacencybyFeature,Feature_Pairs=feature_pairs()) )
             })
             
@@ -1571,17 +1500,7 @@ shinyServer(function(input, output, session) {
             print ("Some adjacency features were calculated and saved for the first time")
           }
           
-        
-        # ######
-        
-        # ##################
-        # Here I will insert the new section to calculate adjacency of certain areas and
-        # save the adjacency of that area
-        # prenameAREAforadjtab<-reactiveVal(NULL);
-        # nameAREAadjtab<-reactiveVal(NULL);
-        # prenameANTIAREAforadjtab<-reactiveVal(NULL);
-        # nameANTIAREAadjtab<-reactiveVal(NULL);
-          #browser()
+     
           if (input$RetainSubset9 == "Area" || input$RetainSubset9 == "Inverse" || input$RetainSubset9 == "Both"){
             prenameAREAforadjtab(paste(substr(input$fileAreaSubsetted$name,1,nchar (input$fileAreaSubsetted$name)-4),
                                        substr(input$file1$name,1,nchar(input$file1$name)-4),substr(input$file2$name,1,nchar(input$file2$name)-6), sep= "__") )
@@ -1598,7 +1517,6 @@ shinyServer(function(input, output, session) {
             thepathadj(getwd())
             print("thepathadj")
             print(thepathadj())
-            #ifelse(!dir.exists(paste0(thepathadj(),"/",prenameAREAforadjtab())), dir.create(paste0(thepathadj(),"/",prenameAREAforadjtab()), showWarnings = TRUE, recursive = FALSE, mode = "0777") , FALSE)
             
             FileLocationAREAadj (paste0(thepathadj(),"/",prenameforadjtab(),"/",nameAREAadjtab) )
             FileLocationANTIAREAadj (paste0(thepathadj(),"/",prenameforadjtab(),"/",nameANTIAREAadjtab) )
@@ -1618,18 +1536,12 @@ shinyServer(function(input, output, session) {
             
             
             if (file.exists(FileLocationAREAadj()) & file.exists(FileLocationANTIAREAadj()) ) {
-              #print(paste(nrow(feature_adj_old_calculatedAREA)," Adjacency score(s) have been previously calculated") )
-              #browser()
               feature_adj_oldAREA <- read.csv(FileLocationAREAadj(), row.names=1)
               feature_adj_oldANTIAREA <- read.csv(FileLocationANTIAREAadj(), row.names=1)
-              #print(feature_adj_oldAREA)
-              # Here it comes the step to select the pairs to be calculated!
               feature_adj_oldAREA$f_g<-paste(feature_adj_oldAREA$f,feature_adj_oldAREA$g, sep="_")
               feature_adj_oldANTIAREA$f_g<-paste(feature_adj_oldANTIAREA$f,feature_adj_oldANTIAREA$g, sep="_")
               feature_pairsAREA( cbind(feature_pairsAREA(),f_g=as.matrix(paste(feature_pairsAREA()[,1],feature_pairsAREA()[,2], sep="_"))) )
               feature_pairsANTIAREA( cbind(feature_pairsANTIAREA(),f_g=as.matrix(paste(feature_pairsANTIAREA()[,1],feature_pairsANTIAREA()[,2], sep="_"))) )
-              
-              #feature_adj_old$f_g %in% feature_pairs()[,3]
               feature_adj_old_calculatedAREA<-feature_adj_oldAREA[feature_adj_oldAREA$f_g %in% feature_pairsAREA()[,3],c(1:5)]
               feature_adj_old_calculatedANTIAREA<-feature_adj_oldANTIAREA[feature_adj_oldANTIAREA$f_g %in% feature_pairsANTIAREA()[,3],c(1:5)]
               
@@ -1649,8 +1561,6 @@ shinyServer(function(input, output, session) {
               } else{
                 print(paste(c(nrow(feature_pairsAREA()),"feature(s) pairs to be calculated:",t(feature_pairsAREA())), collapse = " " ))
                 withProgress(message = 'Calculating adjacency', value = 0, {
-                  #feature_adj <-AdjScoreGenes(infotable2, gene_pairs=feature_pairsAREA, k=3, num_cores=1) 
-                  #datatypeAdjacencybyFeature
                   feature_adjAREA(AdjScore_calculator(infotable2(), feature_type=input$datatypeAdjacencybyFeature,Feature_Pairs=feature_pairsAREA()) )
                 })
                 feature_adj_oldAREA<-feature_adj_oldAREA[,c(1:5)]
@@ -1661,7 +1571,6 @@ shinyServer(function(input, output, session) {
                 
               }
               
-              # ANTIAREA
               testeo<-try(feature_pairsANTIAREA()[!is.element(feature_pairsANTIAREA()[,3],feature_adj_oldANTIAREA$f_g ),c(1,2),drop=FALSE],silent = TRUE)
               class(testeo)
               if (class(testeo) =="try-error") {
@@ -1679,8 +1588,6 @@ shinyServer(function(input, output, session) {
               } else{
                 print(paste(c(nrow(feature_pairsANTIAREA()),"feature(s) pairs to be calculated:",t(feature_pairsANTIAREA())), collapse = " " ))
                 withProgress(message = 'Calculating adjacency', value = 0, {
-                  #feature_adj <-AdjScoreGenes(infotable2, gene_pairs=feature_pairsANTIAREA, k=3, num_cores=1) 
-                  #datatypeAdjacencybyFeature
                   feature_adjANTIAREA(AdjScore_calculator(infotable2(), feature_type=input$datatypeAdjacencybyFeature,Feature_Pairs=feature_pairsANTIAREA()) )
                 })
                 feature_adj_oldANTIAREA<-feature_adj_oldANTIAREA[,c(1:5)]
@@ -1696,30 +1603,15 @@ shinyServer(function(input, output, session) {
             } else {
               print ("Adjacency feature(s) are being calculated and saved for the first time") 
               withProgress(message = 'Calculating adjacency of the area', value = 0, {
-                #feature_adj <-AdjScoreGenes(infotable2, gene_pairs=feature_pairs, k=3, num_cores=1) 
-                #datatypeAdjacencybyFeature
                 infotab2_temp<-infotable2()
                 
                 if (input$datatypeAdjacencybyFeature =="protein" ) {
-                  #dim(infotab2_temp@codex_protein)
-                  #dim(infotab2_temp@codex_clean)
-                  #dim(Tab4piece2() )
                   infotab2_temp@codex_protein<- infotab2_temp@codex_protein[rownames(infotab2_temp@codex_protein) %in%Tab4piece2()$CODEXname,]
-                  #anyNA(infotab2_temp@codex_protein)
-                  #tail(infotab2_temp@codex_protein)
                   infotab2_temp@codex_clean<- infotab2_temp@codex_clean[rownames(infotab2_temp@codex_clean) %in% Tab4piece2()$CODEXname,]
-                  #anyNA(infotab2_temp@codex_clean)
-                  #tail(infotab2_temp@codex_clean)
-                  
                   infotab2_temp@codex_spatial<-infotab2_temp@codex_spatial[rownames(infotab2_temp@codex_spatial) %in%Tab4piece2()$CODEXname,]
-                  #tail(infotab2_temp@codex_spatial)
-                  #anyNA(infotab2_temp@codex_spatial)
-                  #dim(infotab2_temp@codex_spatial)
                   
                 } else {
                   infotab2_temp@codex_mRNA<- infotab2_temp@codex_mRNA[rownames(infotab2_temp@codex_mRNA) %in%Tab4piece2()$CODEXname,]
-                  #dim(infotab2_temp@codex_mRNA)
-                  #anyNA(infotab2_temp@codex_mRNA)
                   
                   infotab2_temp@codex_spatial<-infotab2_temp@codex_spatial[rownames(infotab2_temp@codex_spatial) %in%Tab4piece2()$CODEXname,]
                 }
@@ -1736,31 +1628,15 @@ shinyServer(function(input, output, session) {
               print (paste(dim(feature_adjAREA())[1],"adjacency Area scores amongst feature pairs were calculated and saved for the first time"))
               
               withProgress(message = 'Calculating adjacency of the inverse area', value = 0, {
-                #feature_adj <-AdjScoreGenes(infotable2, gene_pairs=feature_pairs, k=3, num_cores=1) 
-                #datatypeAdjacencybyFeature
                 infotab2_temp<-infotable2()
                 
                 if (input$datatypeAdjacencybyFeature =="protein" ) {
-                  #dim(infotab2_temp@codex_protein)
-                  #dim(infotab2_temp@codex_clean)
-                  #dim(Tab4piece2() )
                   infotab2_temp@codex_protein<- infotab2_temp@codex_protein[!(rownames(infotab2_temp@codex_protein) %in%Tab4piece2()$CODEXname),]
-                  #anyNA(infotab2_temp@codex_protein)
-                  #tail(infotab2_temp@codex_protein)
                   infotab2_temp@codex_clean<- infotab2_temp@codex_clean[!(rownames(infotab2_temp@codex_clean) %in% Tab4piece2()$CODEXname),]
-                  #anyNA(infotab2_temp@codex_clean)
-                  #tail(infotab2_temp@codex_clean)
-                  
                   infotab2_temp@codex_spatial<-infotab2_temp@codex_spatial[!(rownames(infotab2_temp@codex_spatial) %in%Tab4piece2()$CODEXname),]
-                  #tail(infotab2_temp@codex_spatial)
-                  #anyNA(infotab2_temp@codex_spatial)
-                  #dim(infotab2_temp@codex_spatial)
                   
                 } else {
                   infotab2_temp@codex_mRNA<- infotab2_temp@codex_mRNA[!(rownames(infotab2_temp@codex_mRNA) %in%Tab4piece2()$CODEXname),]
-                  #dim(infotab2_temp@codex_mRNA)
-                  #anyNA(infotab2_temp@codex_mRNA)
-                  
                   infotab2_temp@codex_spatial<-infotab2_temp@codex_spatial[!(rownames(infotab2_temp@codex_spatial) %in%Tab4piece2()$CODEXname),]
                 }
                 
@@ -1781,47 +1657,20 @@ shinyServer(function(input, output, session) {
         
         #### The plots start here
           if (input$RetainSubset9 == "Area") {
-          #if (input$RetainSubset9 == "Area" || input$RetainSubset9 == "Inverse"){
-            
+         
             output$p15<- renderPlot({
-              #height=10
-              #browser()
-              # feature_adj_to_plot
               if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
                 feature_adj_to_plot<-feature_adj()
               } else {
                 feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
               }
               
-              
               AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature, title = "Adjacency plot of all Data")
-              
               
             }) # Closing the plot p15 (adjacency)
             
-            #downloadButton(outputId = "down_p15", label = "Download Adjacency plot"),  
-            
-            # output$down_p15 <- downloadHandler(
-            #   
-            #   filename <-function () {
-            #     paste0("adj",input$datatypeAdjacencybyFeature,".pdf")
-            #   }, 
-            #   content <-function (file) {
-            #     if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
-            #       feature_adj_to_plot<-feature_adj()
-            #     } else {
-            #       feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
-            #     }
-            #     pdf(file,width = 10,height = 10)
-            #     AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature)
-            #     dev.off
-            #   }
-            # )  
-            
             output$p16<- renderPlot({
-              #height=10
-              #browser()
-              # # feature_adj_to_plot
+
               if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
                 feature_adj_to_plot<-feature_adj()
               } else {
@@ -1839,33 +1688,23 @@ shinyServer(function(input, output, session) {
               } else {
                 feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
               }
-              
-              #feature_adj()
               feature_adj_to_plot
             })# Closing the datatable of proportions of classification categories
             
             output$p17<- renderPlot({
-              #height=10
-              #browser()
-              # feature_adj_to_plot
               if (dim(feature_adj_old_calculatedAREA)[1]==0 || is.null(feature_adj_old_calculatedAREA)) {
                 feature_adj_to_plot<-feature_adjAREA()
               } else {
                 feature_adj_to_plot<-unique(rbind(feature_adj_old_calculatedAREA,feature_adjAREA()) )
               }
               
-              
               AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature, title = "Adjacency plot of Data inside Area")
-              
               
             }) # Closing the plot p15 (adjacency)
             
             
             
             output$p18<- renderPlot({
-              #height=10
-              #browser()
-              # # feature_adj_to_plot
               if (dim(feature_adj_old_calculatedAREA)[1]==0 || is.null(feature_adj_old_calculatedAREA)) {
                 feature_adj_to_plot<-feature_adjAREA()
               } else {
@@ -1884,7 +1723,6 @@ shinyServer(function(input, output, session) {
                 feature_adj_to_plot<-unique(rbind(feature_adj_old_calculatedAREA,feature_adjAREA()) )
               }
               
-              #feature_adj()
               colnames(feature_adj_to_plot)[3]<-"score_inside_area"
               feature_adj_to_plot
             })# Closing the datatable of proportions of classification categories
@@ -1903,12 +1741,9 @@ shinyServer(function(input, output, session) {
             
             
             } else if (input$RetainSubset9 == "Inverse"){
-              #if (input$RetainSubset9 == "Area" || input$RetainSubset9 == "Inverse"){
               
               output$p15<- renderPlot({
-                #height=10
-                #browser()
-                # feature_adj_to_plot
+
                 if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
                   feature_adj_to_plot<-feature_adj()
                 } else {
@@ -1923,9 +1758,6 @@ shinyServer(function(input, output, session) {
               
               
               output$p16<- renderPlot({
-                #height=10
-                #browser()
-                # # feature_adj_to_plot
                 if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
                   feature_adj_to_plot<-feature_adj()
                 } else {
@@ -1936,7 +1768,6 @@ shinyServer(function(input, output, session) {
                 
               }) # Closing the plot p16 (correlation)
               
-              
               output$AdjacencyTable<- DT::renderDT({
                 if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
                   feature_adj_to_plot<-feature_adj()
@@ -1944,32 +1775,24 @@ shinyServer(function(input, output, session) {
                   feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
                 }
                 
-                #feature_adj()
                 feature_adj_to_plot
               })# Closing the datatable of proportions of classification categories
               
               output$p17<- renderPlot({
-                #height=10
-                #browser()
-                # feature_adj_to_plot
+
                 if (dim(feature_adj_old_calculatedANTIAREA)[1]==0 || is.null(feature_adj_old_calculatedANTIAREA)) {
                   feature_adj_to_plot<-feature_adjANTIAREA()
                 } else {
                   feature_adj_to_plot<-unique(rbind(feature_adj_old_calculatedANTIAREA,feature_adjANTIAREA()) )
                 }
                 
-                
                 AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature, title = "Adjacency plot of Data Outside Area")
-                
                 
               }) # Closing the plot p15 (adjacency)
               
               
               
               output$p18<- renderPlot({
-                #height=10
-                #browser()
-                # # feature_adj_to_plot
                 if (dim(feature_adj_old_calculatedANTIAREA)[1]==0 || is.null(feature_adj_old_calculatedANTIAREA)) {
                   feature_adj_to_plot<-feature_adjANTIAREA()
                 } else {
@@ -2007,29 +1830,20 @@ shinyServer(function(input, output, session) {
               
               
             } else if (input$RetainSubset9 == "Both"){
-        #if (input$RetainSubset9 == "Area" || input$RetainSubset9 == "Inverse"){
         
         output$p15<- renderPlot({
-          #height=10
-          #browser()
-          # feature_adj_to_plot
           if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
             feature_adj_to_plot<-feature_adj()
           } else {
             feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
           }
           
-          
           AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature, title = "Adjacency plot of all Data")
-          
           
         }) # Closing the plot p15 (adjacency)
         
         
         output$p16<- renderPlot({
-          #height=10
-          #browser()
-          # # feature_adj_to_plot
           if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
             feature_adj_to_plot<-feature_adj()
           } else {
@@ -2040,7 +1854,6 @@ shinyServer(function(input, output, session) {
           
         }) # Closing the plot p16 (correlation)
         
-        
         output$AdjacencyTable<- DT::renderDT({
           if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
             feature_adj_to_plot<-feature_adj()
@@ -2048,31 +1861,22 @@ shinyServer(function(input, output, session) {
             feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
           }
           
-          #feature_adj()
           feature_adj_to_plot
         })# Closing the datatable of proportions of classification categories
         
         output$p17<- renderPlot({
-          #height=10
-          #browser()
-          # feature_adj_to_plot
           if (dim(feature_adj_old_calculatedAREA)[1]==0 || is.null(feature_adj_old_calculatedAREA)) {
             feature_adj_to_plot<-feature_adjAREA()
           } else {
             feature_adj_to_plot<-unique(rbind(feature_adj_old_calculatedAREA,feature_adjAREA()) )
           }
           
-          
           AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature, title = "Adjacency plot of Data inside Area")
-          
           
         }) # Closing the plot p15 (adjacency)
         
         
         output$p18<- renderPlot({
-          #height=10
-          #browser()
-          # # feature_adj_to_plot
           if (dim(feature_adj_old_calculatedAREA)[1]==0 || is.null(feature_adj_old_calculatedAREA)) {
             feature_adj_to_plot<-feature_adjAREA()
           } else {
@@ -2083,7 +1887,6 @@ shinyServer(function(input, output, session) {
           
         }) # Closing the plot p16 (correlation)
         
-        
         output$AdjacencyTableArea<- DT::renderDT({
           if (dim(feature_adj_old_calculatedAREA)[1]==0 || is.null(feature_adj_old_calculatedAREA)) {
             feature_adj_to_plot<-feature_adjAREA()
@@ -2091,34 +1894,24 @@ shinyServer(function(input, output, session) {
             feature_adj_to_plot<-unique(rbind(feature_adj_old_calculatedAREA,feature_adjAREA()) )
           }
           
-          #feature_adj()
           colnames(feature_adj_to_plot)[3]<-"score_inside_area"
           feature_adj_to_plot
         })# Closing the datatable of proportions of classification categories
         
         
         output$p23<- renderPlot({
-          #height=10
-          #browser()
-          # feature_adj_to_plot
           if (dim(feature_adj_old_calculatedANTIAREA)[1]==0 || is.null(feature_adj_old_calculatedANTIAREA)) {
             feature_adj_to_plot<-feature_adjANTIAREA()
           } else {
             feature_adj_to_plot<-unique(rbind(feature_adj_old_calculatedANTIAREA,feature_adjANTIAREA()) )
           }
           
-          
           AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature, title = "Adjacency plot of Data Outside Area")
-          
           
         }) # Closing the plot p15 (adjacency)
         
         
-        
         output$p24<- renderPlot({
-          #height=10
-          #browser()
-          # # feature_adj_to_plot
           if (dim(feature_adj_old_calculatedANTIAREA)[1]==0 || is.null(feature_adj_old_calculatedANTIAREA)) {
             feature_adj_to_plot<-feature_adjANTIAREA()
           } else {
@@ -2137,7 +1930,6 @@ shinyServer(function(input, output, session) {
             feature_adj_to_plot<-unique(rbind(feature_adj_old_calculatedANTIAREA,feature_adjANTIAREA()) )
           }
           
-          #feature_adj()
           colnames(feature_adj_to_plot)[3]<-"score_outside_area"
           feature_adj_to_plot
         })# Closing the datatable of proportions of classification categories
@@ -2145,44 +1937,19 @@ shinyServer(function(input, output, session) {
           else {
             
             output$p15<- renderPlot({
-              #height=10
-              #browser()
-              # feature_adj_to_plot
               if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
                 feature_adj_to_plot<-feature_adj()
               } else {
                 feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
               }
               
-              
               AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature,title = "Adjacency plot of all Data")
               
               
             }) # Closing the plot p15 (adjacency)
             
-            #downloadButton(outputId = "down_p15", label = "Download Adjacency plot"),  
-            
-            # output$down_p15 <- downloadHandler(
-            #   
-            #   filename <-function () {
-            #     paste0("adj",input$datatypeAdjacencybyFeature,".pdf")
-            #   }, 
-            #   content <-function (file) {
-            #     if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
-            #       feature_adj_to_plot<-feature_adj()
-            #     } else {
-            #       feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
-            #     }
-            #     pdf(file,width = 10,height = 10)
-            #     AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature)
-            #     dev.off
-            #   }
-            # )  
-            
+           
             output$p16<- renderPlot({
-              #height=10
-              #browser()
-              # # feature_adj_to_plot
               if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
                 feature_adj_to_plot<-feature_adj()
               } else {
@@ -2201,11 +1968,7 @@ shinyServer(function(input, output, session) {
                 feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
               }
               
-              #feature_adj()
               feature_adj_to_plot
-              #box(feature_adj_to_plot,width = 12,title = h3("Adjacency of All Data", style = 'font-size:20px;color:black;'))
-              #feature_adj_to_plot[,-c(1,2)] <-round(feature_adj_to_plot[,-c(1,2)],3)
-              
             })# Closing the datatable of proportions of classification categories
             
             output$p17<- renderPlot({
@@ -2262,48 +2025,6 @@ shinyServer(function(input, output, session) {
         var_features(infotable4()[,input$selectclusteringtype])
       })
     
-    #browser()
-    # observeEvent({
-    #   input$datatypeAdjacencybyCluster}, {
-    #     req(input$datatypeAdjacencybyCluster)
-    #     req(infotable2())
-    #     req(infotable4())
-    #     
-    #       browser()
-    #       # coloring_choicestab4 <- colnames(infotable4()[,-which(sapply(infotable4(), class) == "numeric")] ) # 
-    #       # toremove<-c("CODEXname","CITEname","X","x","y","z", "nFeature_RNA","bc","droplet_class","nFeature_CITE","nFeature_refAssay","condition")
-    #       # idx<- which (coloring_choicestab4 %in% toremove)
-    #       # 
-    #       # coloring_choicestab4<-coloring_choicestab4[-idx]
-    #       # var_to_highlightAdjacencybyCluster <- coloring_choicestab4
-    #       # updateSelectizeInput(session,inputId="selectclusteringtype", choices = var_to_highlightAdjacencybyCluster, options = list(maxItems = 1),selected=var_to_highlightAdjacencybyCluster[1] ) 
-    #       # print(input$selectclusteringtype)
-    #       
-    #       input$var_to_highlightAdjacencybyCluster
-    #       
-    #       # if (input$selectclusteringtype == "") {
-    #       #   updateSelectizeInput(inputId="selectclusteringtype", choices = var_to_highlightAdjacencybyFeature, options = list(maxItems = 1), selected = "orig.ident" ) 
-    #       #   var_features<-unique(infotable4()[,input$selectclusteringtype])
-    #       #   updateSelectizeInput(inputId="selectfeaturesAdjacencybyFeature", choices = var_features, options = list()) 
-    #       # } else {
-    #       #   var_features<-unique(infotable4()[,input$selectclusteringtype])
-    #       #   updateSelectizeInput(inputId="selectfeaturesAdjacencybyFeature", choices = var_features, options = list()) 
-    #       # }
-    #       # observeEvent({
-    #       #   input$selectclusteringtype}, {
-    #       #     req(input$selectclusteringtype)
-    #       #     req(infotable4())
-    #       #     var_features<-unique(infotable4()[,input$selectclusteringtype])
-    #       #     updateSelectizeInput(inputId="selectfeaturesAdjacencybyCluster", choices = var_features, selected =var_features)
-    #       #   })
-    # 
-    #     print("var_to_highlightAdjacencybyCluster")
-    #     print(var_to_highlightAdjacencybyCluster)
-    #     print("input$selectfeaturesAdjacencybyCluster")
-    #     print(input$selectfeaturesAdjacencybyCluster)
-    #     
-    #   })
-    
     observeEvent({
       input$selectclusteringtype}, {
         req(input$selectclusteringtype)
@@ -2314,7 +2035,6 @@ shinyServer(function(input, output, session) {
         
       })
     
-    
     observeEvent({
       input$ploteaAdjacencybyCluster}, {
         req(infotable2())
@@ -2322,28 +2042,15 @@ shinyServer(function(input, output, session) {
         req(var_features())
         req(input$selectclusteringtype)
         req(input$clusterincolorbyCluster)
-        #browser()
-        # ##################
-        # Here we will insert the new section in which we will calculate and
-        # save the adjacency of several clusters
         
         prenameforadjtab(paste(substr(input$file1$name,1,nchar(input$file1$name)-4),substr(input$file2$name,1,nchar(input$file2$name)-6), sep= "_") )
         
-        
         nameadjtab <- paste0("Adjacency_by_Cluster_type","_",input$selectclusteringtype,"_",prenameforadjtab(),".csv") 
         
-        
-        print("nameadjtab")
-        print(nameadjtab)
-        
         thepathadj(getwd())
-        print("thepathadj")
-        print(thepathadj())
         ifelse(!dir.exists(paste0(thepathadj(),"/",prenameforadjtab())), dir.create(paste0(thepathadj(),"/",prenameforadjtab()), showWarnings = TRUE, recursive = FALSE, mode = "0777") , FALSE)
         
         FileLocationadj (paste0(thepathadj(),"/",prenameforadjtab(),"/",nameadjtab) )
-        print("FileLocationadj")
-        print(FileLocationadj())
         
         if (file.exists(FileLocationadj())) {
           print(paste ("Adjacency of", input$selectclusteringtype, "was previously calculated"))
@@ -2354,8 +2061,6 @@ shinyServer(function(input, output, session) {
             print(paste ("Calculating Adjacency of", input$selectclusteringtype))
             
             withProgress(message = 'Calculating adjacency', value = 0, {
-              #feature_adj <-AdjScoreGenes(infotable2, gene_pairs=feature_pairs, k=3, num_cores=1) 
-              #datatypeAdjacencybyFeature
               feature_adj(AdjScoreClustersCODEX_vGator(infotable2(), infotable= infotable4(),clusters=var_features(), k=3, num_cores=1)  )
             })
             
@@ -2371,23 +2076,12 @@ shinyServer(function(input, output, session) {
               
               nameANTIAREAadjtab <- paste0("Adj_by_Cluster_InverseArea_",sctyp,"_",prenameAREAforadjtab(),".csv")
               
-              print("nameAREAadjtab")
-              print(nameAREAadjtab)
-              print("nameINVERSEAREAadjtab")
-              print(nameANTIAREAadjtab)
-              
               thepathadj(getwd())
-              print("thepathadj")
-              print(thepathadj())
               
               FileLocationAREAadj (paste0(thepathadj(),"/",prenameforadjtab(),"/",nameAREAadjtab) )
               FileLocationANTIAREAadj (paste0(thepathadj(),"/",prenameforadjtab(),"/",nameANTIAREAadjtab) )
               
-              print("FileLocationAREAadj")
-              print(FileLocationAREAadj())
-              print("FileLocationANTIAREAadj")
-              print(FileLocationANTIAREAadj())
-              
+             
               if (file.exists(FileLocationAREAadj()) & file.exists(FileLocationANTIAREAadj()) ) {
                 print(paste ("Adjacency by cluster of", input$selectclusteringtype, "was previously calculated"))
                 
@@ -2429,25 +2123,6 @@ shinyServer(function(input, output, session) {
         output$p21<- renderPlot({
           AdjScoreHeatmap_v2(adj_score_output= feature_adj(),low_color=input$color1AdjacencybyCluster,high_color =input$color2AdjacencybyCluster,title = "Adjacency plot of all Data",Subset_Matrix = input$clusterincolorbyCluster)
         }) # Closing the plot p21 (adjacency)
-        
-        #downloadButton(outputId = "down_p15", label = "Download Adjacency plot"),  
-        
-        # output$down_p15 <- downloadHandler(
-        #   
-        #   filename <-function () {
-        #     paste0("adj",input$datatypeAdjacencybyFeature,".pdf")
-        #   }, 
-        #   content <-function (file) {
-        #     if (dim(feature_adj_old_calculated)[1]==0 || is.null(feature_adj_old_calculated)) {
-        #       feature_adj_to_plot<-feature_adj()
-        #     } else {
-        #       feature_adj_to_plot<-unique(rbind(feature_adj_old_calculated,feature_adj()) )
-        #     }
-        #     pdf(file,width = 10,height = 10)
-        #     AdjScoreHeatmap_v2(adj_score_output= feature_adj_to_plot,low_color=input$color1AdjacencybyFeature,high_color =input$color2AdjacencybyFeature)
-        #     dev.off
-        #   }
-        # )  
         
         output$p22<- renderPlot({       
           
@@ -2633,13 +2308,9 @@ shinyServer(function(input, output, session) {
           })# Closing the datatable of proportions of classification categories
         }
         
-        
-        
-        
       })# Closing the observeEvent of ploteaAdjacencybyFeature
     
     ######################
-    
     
     
   } # Closing the Function
