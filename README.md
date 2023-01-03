@@ -1,5 +1,6 @@
 # InterroGATOR
 Created: October/19/2021
+
 Last update: December/22/2022 (v1.2)         InterroGATOR release!
 
 Author: Leandro Balzano-Nogueira
