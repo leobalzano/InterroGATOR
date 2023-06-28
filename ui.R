@@ -86,7 +86,6 @@ shinyUI(
                         condition = "input.clusterinsidethecolumnname != '' ",
                         actionButton("CreateVariable_actionbutton", "Create Variable")  
                       )
-                      
                     ),
                 radioButtons(
                   inputId="ColumnMerger",
