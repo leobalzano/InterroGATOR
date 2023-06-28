@@ -46,7 +46,6 @@ library(parallel)
 ## ui.R ##
 options(shiny.maxRequestSize=120000*1024^2)
 
-
 upload_data <- tags$a(span("InterroGATOR", style = "color: white; font-size: 30px;font-weight: bold"),tags$img(src="Gator.jpg", height="40", width= "50"))
 
 shinyUI(
