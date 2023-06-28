@@ -4,12 +4,11 @@
 # Author: Leandro Balzano-Nogueira
 # Diabetes Institute, University of Florida (Gainesville)
 # Created: October/19/2021
-# Last update: December/22/2022
+# Last update: June/28/2023
 
 # Creating and hiding calculations for posterior analyses
 
 # This is a Shiny application for conducting differential expression and Spatial analyses on different cell types in different human tissues. This application allows the user to analyze cell expression profiles from CITEseq and CODEX data previously integrated.
-
 
 #############################################
 # Libraries:
@@ -41,21 +40,19 @@ library (grDevices)
 library(randomcoloR)
 library(AdjacencyScore)
 library(sparseMatrixStats)
-
+library(parallel)
 
 #############################################
 ## ui.R ##
 options(shiny.maxRequestSize=120000*1024^2)
 
+
 upload_data <- tags$a(span("InterroGATOR", style = "color: white; font-size: 30px;font-weight: bold"),tags$img(src="Gator.jpg", height="40", width= "50"))
 
 shinyUI(
   dashboardPage(skin = "blue", #skin color
-   
     ### HEADER
     dashboardHeader(title=upload_data), ## Header
-
-    
     ### Side Bar
     dashboardSidebar(
       sidebarMenu(id = "sidebarmenu", ### create a menu in the sidebar
@@ -64,15 +61,10 @@ shinyUI(
           conditionalPanel("input.sidebarmenu === 'fileupload'",
           fluidPage(
               # File Input 1
-
               fileInput("file1", label = h4("Insert Seurat rds file")),
-              
-                                   
               fileInput("file2", label = h4("Insert RData object")),
-              
               selectInput(inputId = "colby", label = "Classification category",choices = list() ), 
               sliderInput(inputId = "size1",label = "Size",min = 0,max = 5,value = 2.4,step = 0.1),
-              
               radioButtons(
                 inputId="AreaAnalysis",
                 label="Do you have an area of interest?",
@@ -81,13 +73,37 @@ shinyUI(
                   "No"
                 ),
                 selected="No"),
-              
               conditionalPanel(
                 condition = "input.AreaAnalysis != 'No'",
                   fileInput("fileAreaSubsetted", label = h4("Insert cell coordinates CSV file")),
+                radioButtons( inputId="AddasaVariable",
+                  label="Do you want to add this information as a variable?",
+                  choices=list( "Yes",  "No" ), selected="No"),
+                    conditionalPanel(
+                      condition = "input.AddasaVariable != 'No'",
+                      textInput ( 'thecolumnname', 'Insert a name for the Variable', value=""),
+                      textInput ( 'clusterinsidethecolumnname', 'Insert a cluster name to identify this group', value=""),
+                      conditionalPanel(
+                        condition = "input.clusterinsidethecolumnname != '' ",
+                        actionButton("CreateVariable_actionbutton", "Create Variable")  
+                      )
+                      
+                    ),
+                radioButtons(
+                  inputId="ColumnMerger",
+                  label="Do you want to merge variables of interest?",
+                  choices=list( "Yes","No"),selected="No"),
+                conditionalPanel(
+                  condition = "input.ColumnMerger != 'No'",
+                  selectInput(inputId = "Variable1tomerge", label = "Select variable 1 to merge",choices = list() ),
+                  selectInput(inputId = "Variable2tomerge", label = "Select variable 2 to merge",choices = list() ),
+                  conditionalPanel(
+                    condition = "input.Variable2tomerge != '' ",
+                    actionButton("MergeVariable_actionbutton", "Merge Variables")  
+                  )
+                  ),
                   radioButtons(inputId="RetainSubset", label="Subset?", choices= list("Area","Inverse", "All"), selected = "All")
               ),
-              
               ) # Closing fluidPage of input  
             ), # Closing conditionalPanel of Input
           
@@ -102,7 +118,6 @@ shinyUI(
                                condition = "input.AreaAnalysis != 'No'",
                                radioButtons(inputId="RetainSubset2", label="Subset?", choices= list("Area","Inverse", "All"), selected = "All")
                              ),
-                             
                              sliderInput(inputId = "sizeumapindsamples",label = "Size",min = 0,max = 5,value = 2.4,step = 0.1),
                              actionButton("ploteaumapindsamples", "Plot")
                            ) # Closing fluidPage of CITE UMAP of samples plotted individually
@@ -128,10 +143,10 @@ shinyUI(
           ), # Closing conditionalPanel of CITE independent Tab
           
           # CITEtoCODEXspatial extrapolation tab
-          menuItem("CITEtoCODEXspatial extrapolation", tabName = "spatial1", icon = icon("code-branch")),
+          menuItem("CITE-CODEX extrapolation", tabName = "spatial1", icon = icon("code-branch")),
           conditionalPanel("input.sidebarmenu === 'spatial1'",
                            fluidPage(
-                             textInput(inputId="IdentificationThreshold", label="Probability of Identification (only for RNA)", value= 0),
+                             textInput(inputId="IdentificationThreshold", label="Probability of Identification", value= 0),
                              # File Input 1
                              selectInput(inputId = "cluster1", label = "Classification category",choices = list() ),
                              sliderInput(inputId = "size2",label = "Size",min = 0,max = 5,value = 1.3,step = 0.1),
@@ -140,17 +155,17 @@ shinyUI(
                                radioButtons(inputId="RetainSubset4", label="Subset?", choices= list("Area","Inverse", "All"), selected = "All")
                              ),
                              actionButton("ploteaExtrapolationTab", "Plot")
-                           ) # Closing fluidPage of CITEtoCODEXspatial extrapolation tab  
+                           ) # Closing fluidPage of CITEtoCODEXspatial extrapolation tab
           ), # Closing conditionalPanel of CITEtoCODEXspatial extrapolation tab
           
           # CITEtoCODEXspatial independent tab
-          menuItem("CITEtoCODEXspatial independent", tabName = "spatial2", icon = icon("code-branch")),
+          menuItem("CITE-CODEX independent", tabName = "spatial2", icon = icon("code-branch")),
           conditionalPanel("input.sidebarmenu === 'spatial2'",
                            fluidPage(
-                             
+                             textInput(inputId="IdentificationThresholdIndependent", label="Probability of Identification", value= 0),
                              selectInput(inputId = "cluster2", label = "Classification category",choices = list("predicted.celltype.l2","Higher_Hierarchy_grouping") ),
                              selectInput(inputId = "clusterincolor", label = "Colored category(ies)",choices = list(), multiple = TRUE ),
-                             sliderInput(inputId = "sizespatial2",label = "Size",min = 0,max = 5,value = 2.2,step = 0.1),
+                             sliderInput(inputId = "sizespatial2",label = "Size",min = 0,max = 5,value = 1.3,step = 0.1),
                              conditionalPanel(
                                condition = "input.AreaAnalysis != 'No'",
                                radioButtons(inputId="RetainSubset5", label="Subset?", choices= list("Area","Inverse", "All"), selected = "All")
@@ -163,32 +178,23 @@ shinyUI(
           menuItem("DE analysis 1", tabName = "DEsTabandUMaps", icon = icon("code-branch")) ,
           conditionalPanel("input.sidebarmenu === 'DEsTabandUMaps'",
                            fluidPage(
-                             
                              selectInput(inputId = "colbyDE", label = "Classification category",choices = list() ),
-                             
                              selectizeInput(inputId="selectDE", label="DE analysis", choices = list(), options = list(maxItems = 2)),
-                             
                              radioButtons("datatypeDE", "Data type:",
                                           c("RNA" = "cite_mRNA_norm",
-                                            "Protein" = "cite_protein"),selected = "RNA"),
+                                            "CODEX-Protein" = "CODEX_protein",
+                                            "CITE-Protein" = "CITE_protein"),selected = "RNA"),
                              actionButton("calculaDE", "Calculate"),
-                             
                              selectizeInput(inputId="NonDEfeatures", label="Add non DE features", choices = NULL, multiple = TRUE),
-                             
                              selectizeInput(inputId="featureUMAPDE", label="Select up to 9 features", choices = list(), options = list(maxItems = 9), selected=NULL),
-                             
-                             sliderInput(inputId = "sizeDE",label = "Size",min = 0,max = 5,value = 1.2,step = 0.1),
-                             
+                             sliderInput(inputId = "sizeDE",label = "Size",min = 0,max = 5,value = 1.3,step = 0.1),
                              conditionalPanel(
                                condition = "input.datatypeDE != 'Protein'",
-                               sliderInput(inputId="minco", label="Minimum cutoff (only for RNA)", min = 0,max=1,value=0,step=0.1) ),
-                             
-                             
+                               sliderInput(inputId="minco", label="Minimum cutoff", min = 0,max=1,value=0,step=0.1) ),
                              selectInput(inputId = "colorUMAPDE", label = "High positive Color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black", "gray95","gray75"),selected = "darkred" ),
                              selectInput(inputId = "colorUMAPDE2", label = "Low Color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black", "gray95","gray75"),selected = "gray95" ),
                              selectInput(inputId = "colorUMAPDE3", label = "High negative Color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black", "gray95","gray75"),selected = "dodgerblue2" ),
                              actionButton("ploteaUMAPDE", "Plot")
-                             
                            ) # Closing fluidPage of DEs table and Umaps Analysis
           ), # Closing conditionalPanel of DEs table and Umaps Analysis
           
@@ -196,7 +202,6 @@ shinyUI(
           menuItem("DE analysis 2", tabName = "DEHeatmapRidgeandViolin", icon = icon("code-branch")) ,
           conditionalPanel("input.sidebarmenu === 'DEHeatmapRidgeandViolin'",
                            fluidPage(
-                             
                              radioButtons(
                                inputId="allorsomefeatures",
                                label="Select all or some features for Heatmap",
@@ -205,11 +210,9 @@ shinyUI(
                                  "Manual Selection"
                                ),
                                selected="All"),
-                             
                              conditionalPanel(
                                condition = "input.allorsomefeatures != 'All'",
                                selectizeInput(inputId="selectfeaturesforheatmap", label="Select Features for Heatmap", choices = list() , multiple = TRUE ) ),
-                             
                              radioButtons(
                                inputId="allorsomeGroups",
                                label="Select all or some categories for Heatmap",
@@ -218,57 +221,51 @@ shinyUI(
                                  "Manual Selection"
                                ),
                                selected="All"),
-                             
                              conditionalPanel(
                                condition = "input.allorsomeGroups != 'All'",
                                selectizeInput(inputId="selectgroupsforheatmap", label="Select categories for Heatmap", choices = list(), multiple = TRUE )
                              ),
                              selectizeInput(inputId="selectgroupsorder", label="Sort categories as desired", choices = list(), multiple = TRUE ),
+                             radioButtons("toscaleornottoscale", "Scale Heatmap?",
+                                          choices=list("row","column","none"),selected="none"),
                              numericInput(inputId="cellnumber",label = "Number of Cells to plot", value = 10,min = 10,max=300,step = 1),
                              numericInput(inputId="lowerbreak",label = "Lower Break", value = -5,min = -100,max=100,step = 1),
                              numericInput(inputId="upperbreak",label = "Upper Break", value = 5,min = -100,max=100,step = 1),
-                             
                              numericInput(inputId="heatmapPlotsize",label = "Heatmap size (px)", value = 1000,min = 100,max=3000,step = 1),
                              numericInput(inputId="heatmapLegendsize",label = "Legend size", value = 0.8,min = 0.1,max=3,step = 0.1),
                              numericInput(inputId="heatmapFeaturesize",label = "Feature size", value = 0.8,min = 0.1,max=3,step = 0.1),
-                             
-                             
-                             
                              radioButtons("heatmapcolor", "Heatmap color",
                                           c("Purple/Yellow" = "purpleyellow",
                                             "Blue/Red" = "bluered")),
-                             
                              actionButton("ploteaHeatmap", "Plot"),
-                             
                              selectizeInput(inputId="selectfeaturesforridgeandviolin", label="Select Features for Ridge/Violin", choices = list() , options = list(maxItems = 12)),
                              selectizeInput(inputId="selectgroupsforridgeandviolin", label="Select categories to plot", choices = list(), multiple = TRUE ),
                              actionButton("plotearidgeandviolin", "Plot Ridge/Violin")
-                             
-                             
                            ) # Closing fluidPage of DE Heatmap, Ridge and Violin plots
           ), # Closing conditionalPanel of DE Heatmap, Ridge and Violin plots
           
           # Expression CODEX spatial Analysis
-          menuItem("Spatial Expression", tabName = "CODEXspatialexpression", icon = icon("code-branch")) ,
+          menuItem("Spatial expression", tabName = "CODEXspatialexpression", icon = icon("code-branch")) ,
           conditionalPanel("input.sidebarmenu === 'CODEXspatialexpression'",
                            fluidPage(
                              selectInput(inputId = "clusterSpatialExpression", label = "Classification category",choices = list("predicted.id","predicted.celltype.l2","Higher_Hierarchy_grouping") ),
-                             textInput(inputId="IdentificationThreshold2", label="Probability of Identification (only for RNA)", value= 0),
+                             textInput(inputId="IdentificationThreshold2", label="Probability of Identification", value= 0),
                              selectInput(inputId = "clusterincolorSpatialExpression", label = "Colored category(ies)",choices = list(), multiple = TRUE ),
                              radioButtons("datatypeCODEXspatial", "Data type:",
                                           c("RNA" = "RNA",
-                                            "Protein" = "protein"),selected = "Protein"),
+                                            "CODEX_Protein" = "CODEX_protein",
+                                            "CITE_Protein" = "CITE_protein"),selected = "CODEX_Protein"),
                              selectizeInput(inputId="selectfeaturesCODEXspatial", label="Select one or two features", choices = NULL, options = list(maxItems = 2)),
                              sliderInput(inputId = "sizefeatCODEXspatial",label = "Size",min = 0,max = 5,value = 0.8,step = 0.1),
                              radioButtons(inputId="maximize_differences", label="Maximize differences", 
                                             choices = c("Yes" = "yes",
-                                                        "No" = "no"),selected = "No"),
+                                                        "No" = "no"),selected = "no"),
                              selectInput(inputId = "colorCODEXspatial", label = "High positive Color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black", "gray95","gray75"),selected = "darkred" ),
                              selectInput(inputId = "colorCODEXspatial2", label = "Low Color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black", "gray95","gray75"),selected = "gray95" ),
                              selectInput(inputId = "colorCODEXspatial3", label = "High negative Color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black", "gray95","gray75"),selected = "dodgerblue2" ),
                              conditionalPanel(
                                condition = "input.datatypeCODEXspatial != 'Protein'",
-                               sliderInput(inputId="mincoCODEXspatial", label="Minimum cutoff (only for RNA)", min = 0,max=1,value=0.60,step=0.01) ),
+                               sliderInput(inputId="mincoCODEXspatial", label="Minimum cutoff", min = 0,max=1,value=0.60,step=0.01) ),
                              conditionalPanel(
                                condition = "input.AreaAnalysis != 'No'",
                                radioButtons(inputId="RetainSubset6", label="Subset?", choices= list("Area","Inverse", "All"), selected = "All"),
@@ -283,23 +280,20 @@ shinyUI(
                                radioButtons(inputId="OnlyShowGroups", label="Show only the groups?", choices= list("Yes","No"), selected = "No")
                              ),                             
                              actionButton("ploteaCODEXspatial", "Plot")
-                             
                            ) # Closing fluidPage of Expression CODEX spatial Analysis
           ), # Closing conditionalPanel of Expression CODEX spatial Analysis
           
           # Expression CODEX UMAP Analysis
-          menuItem("CODEX UMAP Clusters", tabName = "CODEXUMAPclusters", icon = icon("code-branch")) ,
+          menuItem("CODEX UMAP clusters", tabName = "CODEXUMAPclusters", icon = icon("code-branch")) ,
           conditionalPanel("input.sidebarmenu === 'CODEXUMAPclusters'",
                            fluidPage(
                              selectizeInput(inputId="selectclusteringtypeUMAPclusters", label="Select clustering type", choices = list(), options = list(maxItems = 1),selected = "orig.ident" ),
-                             textInput(inputId="IdentificationThreshold3", label="Probability of Identification (only for RNA-related features)", value= 0),
+                             textInput(inputId="IdentificationThreshold3", label="Probability of Identification", value= 0),
                              sliderInput(inputId = "sizefeatCODEXUMAPclusters",label = "Size",min = 0,max = 5,value = 0.8,step = 0.1),
                              radioButtons("SelectiononTopCODEXUMAPAnalysis", "Selection on Top:",
                                           c("Yes" = "yes",
                                             "No" = "no")),
-                             
                              actionButton("ploteaCODEXUMAPclusters", "Plot")
-
                            ) # Closing fluidPage of Expression CODEX UMAP clusters Analysis
           ), # Closing conditionalPanel of Expression CODEX UMAP clusters Analysis
 
@@ -310,7 +304,7 @@ shinyUI(
                              # File Input 1
                              selectInput(inputId = "highlightCODEXindep", label = "Category to highlight",choices = list() ),
                              selectInput(inputId = "colorCODEXindep", label = "Color",choices = list("darkred", "red", "blue","darkblue", "black"),selected = "darkred" ),
-                             textInput(inputId="IdentificationThreshold4", label="Probability of Identification (only for RNA-related features)", value= 0),
+                             textInput(inputId="IdentificationThreshold4", label="Probability of Identification", value= 0),
                              sliderInput(inputId = "sizeCODEX",label = "Size",min = 0,max = 5,value = 1.2,step = 0.1),
                              radioButtons("SelectiononTopCODEX", "Selection on Top:",
                                           c("Yes" = "yes",
@@ -326,20 +320,17 @@ shinyUI(
                            fluidPage(
                              radioButtons("datatypeAdjacencybyFeature", "Data type:",
                                           c("RNA" = "RNA",
-                                            "Protein" = "protein")),
+                                            "CODEX-Protein" = "CODEX_protein",
+                                            "CITE-Protein" = "CITE_protein"
+                                            )),
                              conditionalPanel(
                                condition = "input.AreaAnalysis != 'No'",
                                radioButtons(inputId="RetainSubset9", label="Subset?", choices= list("Area","Inverse","Both", "All Data"), selected = "All Data"),
-                               
                              ),
-                             
                              selectizeInput(inputId="selectfeaturesAdjacencybyFeature", label="Select features", choices = NULL, options = list(maxItems = 200))  ,
                              selectInput(inputId = "color1AdjacencybyFeature", label = "Low color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black","white","yellow", "gray95","gray75"),selected = "white" ),
-                             
                              selectInput(inputId = "color2AdjacencybyFeature", label = "High color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black","white","yellow", "gray95","gray75"),selected = "darkred" ),
-                             
                              actionButton("ploteaAdjacencybyFeature", "Plot")
-                             
                            ) # Closing fluidPage of CODEX Adjacency analysis by feature
           ), # Closing conditionalPanel of CODEX Adjacency analysis by feature
           
@@ -347,24 +338,17 @@ shinyUI(
           menuItem("Adjacency analysis by cluster", tabName = "AdjacencybyCluster", icon = icon("code-branch")) ,
           conditionalPanel("input.sidebarmenu === 'AdjacencybyCluster'",
                            fluidPage(
-                             
                                selectizeInput(inputId="selectclusteringtype", label="Select clustering type", choices = list(), options = list(maxItems = 1),selected = "orig.ident" ),
                                selectInput(inputId = "clusterincolorbyCluster", label = "Select groups",choices = list(), multiple = TRUE ),
-                               
                                conditionalPanel(
                                  condition = "input.AreaAnalysis != 'No'",
                                  radioButtons(inputId="RetainSubset10", label="Subset?", choices= list("Area","Inverse","Both", "All Data"), selected = "All Data"),
                                ),
-                               
-                               selectInput(inputId = "color1AdjacencybyCluster", label = "Low color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black","white","yellow", "gray95","gray75"),selected = "white" ),
-                             
+                             selectInput(inputId = "color1AdjacencybyCluster", label = "Low color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black","white","yellow", "gray95","gray75"),selected = "white" ),
                              selectInput(inputId = "color2AdjacencybyCluster", label = "High color",choices = list("darkred", "red","dodgerblue2", "blue","darkblue", "black","white","yellow", "gray95","gray75"),selected = "darkred" ),
-                             
                              actionButton("ploteaAdjacencybyCluster", "Plot")
-                             
                            ) # Closing fluidPage of CODEX Adjacency analysis by cluster
           ) # Closing conditionalPanel of CODEX Adjacency analysis by cluster
-          
          )# Closing sidebarMenu
     ), #Closing dashboardSidebar
     
@@ -438,9 +422,7 @@ shinyUI(
         ),  # Clossing tabItem of DEHeatmapRidgeandViolin
         
         tabItem(tabName = "CODEXspatialexpression",
-                
                 fluidRow(plotOutput ("p14", height = 1000), style =  "width: 95%"
-                         
                 )#Closing the fluid Row of the Spatial plots of CODEXspatialexpression
         ),  # Clossing tabItem of CODEXspatialexpression
         
@@ -456,8 +438,6 @@ shinyUI(
                 fluidRow(plotOutput ("p20", height = 1000), style =  "width: 95%"
                 ) #Closing the fluid Row of CITE independent
         ), # Closing tabItem of CITE independent     
-        
-        
         
         tabItem(tabName = "AdjacencybyFeature",
                         fluidRow(plotOutput ("p15", height = 1000), style =  "width: 95%"
@@ -515,13 +495,10 @@ shinyUI(
                         br(),
                         fluidRow(DT::DTOutput ("AdjacencyTableClusterANTIArea"), style =  "font-size: 95%; width: 95%" 
                         ) #Closing the fluid Row of the adjacency table of an Area by feature
-                
         ) # Closing tabItem of AdjacencybyCluster       
-        
       ) # Closing TabItems
     ) # Closing dashboardBody
   ) # Closing dashboardPage
 ) # Closing shinyUI
-
 
 # END
