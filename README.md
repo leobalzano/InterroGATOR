@@ -1,4 +1,4 @@
-# InterroGATOR
+## InterroGATOR
 Created: October/19/2021
 
 Last update: June/28/2023 (v1.2)         InterroGATOR release!
